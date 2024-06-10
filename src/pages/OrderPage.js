@@ -1,9 +1,7 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ContainerOutlined } from "@ant-design/icons";
 import { Button, Table, Modal, message } from "antd";
 import axios from 'axios';
-
 
 const boxStyle = {
   margin: '0 10px',
@@ -24,7 +22,6 @@ const statusMap = {
   5: '已关闭',
   6: '已完成'
 }
-
 
 const OrderPage = () => {
   const [data, setData] = useState([]);
@@ -51,7 +48,6 @@ const OrderPage = () => {
       });
   }, []);
 
-
   const handleViewOrder = (record) => {
     setSelectedOrder(record);
     setModalVisible(true);
@@ -63,9 +59,11 @@ const OrderPage = () => {
   };
 
   const handleShipOrder = (orderId) => {
-    axios.put(`http://localhost:8081/api/order/ship`, { id: orderId })
+    axios.put(`http://localhost:8081/api/order/ship`, null, {
+        params: { id: orderId }
+      })
       .then(response => {
-        if (response.data) {
+        if (response.data === "Order shipped successfully.") {
           message.success('订单已发货');
           // 更新订单状态为已发货
           setData(prevData => prevData.map(order =>
@@ -77,6 +75,25 @@ const OrderPage = () => {
       })
       .catch(error => {
         message.error('发货失败: ' + (error.message || '未知错误'));
+        console.error(error);
+      });
+  };
+
+  const handleDeleteOrder = (orderId) => {
+    axios.delete(`http://localhost:8081/api/order/delete`, {
+        params: { id: orderId }
+      })
+      .then(response => {
+        if (response.data.code === 200) {
+          message.success('订单已删除');
+          // 从订单列表中删除订单
+          setData(prevData => prevData.filter(order => order.id !== orderId));
+        } else {
+          message.error('删除订单失败');
+        }
+      })
+      .catch(error => {
+        message.error('删除订单失败: ' + (error.message || '未知错误'));
         console.error(error);
       });
   };
@@ -124,7 +141,7 @@ const OrderPage = () => {
           <span>
             <Button style={{ marginRight: 10 }} onClick={() => handleViewOrder(record)} >查看订单</Button>
             {status === 2 && <Button style={{ marginRight: 10 }} onClick={() => handleShipOrder(record.id)} >订单发货</Button>}
-            {(status === 4 || status === 5 || status === 6) && <Button danger>删除订单</Button>}
+            {(status === 4 || status === 5 || status === 6) && <Button danger onClick={() => handleDeleteOrder(record.id)}>删除订单</Button>}
           </span>
         )
       },
@@ -135,7 +152,7 @@ const OrderPage = () => {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div children='orderPage'>
+    <div className='orderPage'>
       <div style={boxStyle}>
         <ContainerOutlined />
         <span style={{ marginLeft: '5px' }}>订单列表</span>
@@ -154,7 +171,7 @@ const OrderPage = () => {
             <p><strong>订单编号:</strong> {selectedOrder.id}</p>
             <p><strong>创建时间:</strong> {selectedOrder.create_time}</p>
             <p><strong>用户ID:</strong> {selectedOrder.user_id}</p>
-            <p><strong>订单金额:</strong> ¥{selectedOrder.total_fee.toFixed(2)}</p>
+            <p><strong>订单金额:</strong> ¥{(selectedOrder.total_fee / 100).toFixed(2)}</p>
             <p><strong>订单状态:</strong> {statusMap[selectedOrder.status]}</p>
             {/* 你可以在这里添加更多的订单详情 */}
           </div>
