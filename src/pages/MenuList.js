@@ -165,7 +165,7 @@ const MenuList = () => {
         localStorage.setItem('menuList', JSON.stringify(newData));
         message.success('删除成功');
       },
-      onCancel() {},
+      onCancel() { },
     });
   };
 
