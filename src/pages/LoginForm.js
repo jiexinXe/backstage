@@ -34,9 +34,33 @@ const LoginForm = () => {
     navigate('/register');
   };
 
+  const exportLocalStorage = () => {
+    const localStorageData = JSON.stringify(localStorage);
+    navigator.clipboard.writeText(localStorageData).then(() => {
+      message.success('localStorage 信息已复制到剪贴板');
+    });
+  };
+
+  const importLocalStorage = () => {
+    const importedData = prompt('请粘贴导入的数据:');
+    if (importedData) {
+      try {
+        const parsedData = JSON.parse(importedData);
+        for (const key in parsedData) {
+          localStorage.setItem(key, parsedData[key]);
+        }
+        message.success('localStorage 信息已成功导入!');
+      } catch (error) {
+        message.error('导入的数据格式有误');
+      }
+    } else {
+      message.warning('请粘贴有效的数据');
+    }
+  };
+
   return (
     <div style={styles.container}>
-      <div className="loader" style={styles.loader}></div> {}
+      <div className="loader" style={styles.loader}></div>
       <Card style={styles.card}>
         <div style={styles.iconContainer}>
           <UserOutlined style={styles.icon} />
@@ -68,6 +92,16 @@ const LoginForm = () => {
               </Col>
               <Col span={12}>
                 <Button type="default" onClick={goToRegister} style={styles.button}>注册</Button>
+              </Col>
+            </Row>
+          </Form.Item>
+          <Form.Item>
+            <Row gutter={8}>
+              <Col span={12}>
+                <Button type="default" onClick={exportLocalStorage} style={styles.button}>导出 localStorage</Button>
+              </Col>
+              <Col span={12}>
+                <Button type="default" onClick={importLocalStorage} style={styles.button}>导入 localStorage</Button>
               </Col>
             </Row>
           </Form.Item>
