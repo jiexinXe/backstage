@@ -95,16 +95,6 @@ const LoginForm = () => {
               </Col>
             </Row>
           </Form.Item>
-          <Form.Item>
-            <Row gutter={8}>
-              <Col span={12}>
-                <Button type="default" onClick={exportLocalStorage} style={styles.button}>导出 localStorage</Button>
-              </Col>
-              <Col span={12}>
-                <Button type="default" onClick={importLocalStorage} style={styles.button}>导入 localStorage</Button>
-              </Col>
-            </Row>
-          </Form.Item>
         </Form>
       </Card>
       <div className="loop cubes" style={styles.cubes}>
